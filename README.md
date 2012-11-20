@@ -1,14 +1,15 @@
 # loggly-console
 
-Loggly wrapper for console.log
+Loggly wrapper for console.log (Agilio version to fix the `options` argument
+and prevent possible future surprises).
 
 ## Example
 
     var augmentConsole = require("loggly-console")
 
     augmentConsole({
-        domain: "your loggly sub domain"
-        , key: "your input key"
+        subdomain: "your loggly sub domain"
+        , inputKey: "your input key"
     })
 
     // Now console.log / error / etc is overwritten to send logging data
