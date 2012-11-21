@@ -1,6 +1,7 @@
 var loggly = require('loggly')
     , slice = Array.prototype.slice
     , sent = false
+    , util = require('util')
 
 module.exports = augmentConsole
 
@@ -21,17 +22,20 @@ function augmentConsole(options) {
         console[name] = interceptConsole
 
         function interceptConsole(first) {
+            
             log({
-                content: first
+                message: util.format.apply(util, arguments)
                 , methodName: name
-                , first: arguments[1]
-                , second: arguments[2]
-                , third: arguments[3]
-                , fourth: arguments[4]
-                , timestamp: Date.now()
+                , timestamp: getUTCTimeStamp()
             })
             old && old.apply(console, arguments)
         }
+    }
+
+    function getUTCTimeStamp() {
+        var now = new Date(); 
+        var now_utc = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),  now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds());
+        return now_utc.toJSON();
     }
 
     function handlException(err) {
@@ -42,11 +46,11 @@ function augmentConsole(options) {
                 err.stack + "\n")
 
             log({
-                content: "uncaught exception"
-                , methodName: "log"
-                , first: err
-                , timestamp: Date.now()
-                , stack : err.stack
+                message: "uncaught exception"
+                , methodName: "error"
+                , error: err
+                , timestamp: getUTCTimeStamp()
+                , stackTrace : err.stack
             })
         }
 
