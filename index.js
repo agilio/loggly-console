@@ -3,6 +3,8 @@ var loggly = require('loggly')
     , sent = false
     , util = require('util')
 
+require('callsite')
+
 module.exports = augmentConsole
 
 function augmentConsole(options) {
@@ -27,6 +29,7 @@ function augmentConsole(options) {
                 message: util.format.apply(util, arguments)
                 , methodName: name
                 , timestamp: getUTCTimeStamp()
+                , stackTrace: simplifyStackTrace(__stack)
             })
             old && old.apply(console, arguments)
         }
@@ -68,5 +71,15 @@ function augmentConsole(options) {
         } catch (err) {
             /* ignore errors. Most likely json stringify errors */
         }
+    }
+
+    function simplifyStackTrace(stackTrace){
+        return stackTrace.map(function(call) {
+            return {
+                fn: call.getFunctionName() || 'anonymous',
+                fileName: call.getFileName(),
+                lineNumber: call.getLineNumber()
+            }
+        });
     }
 }
